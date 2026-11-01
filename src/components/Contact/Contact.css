@@ -1,0 +1,248 @@
+.contact__head {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.contact__head .section-tag {
+  justify-content: center;
+}
+
+.contact__wrap {
+  max-width: 920px;
+}
+
+/* ---------- Email ---------- */
+
+.contact__email {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 34px 32px 32px;
+  margin-bottom: 20px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.contact__email::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(var(--cyan-rgb), 0.08) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: contact-sweep 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes contact-sweep {
+  60%, 100% { transform: translateX(100%); }
+}
+
+.contact__email-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.contact__target {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.08);
+  border: 1px solid var(--border-strong);
+}
+
+.contact__target svg {
+  animation: contact-lock 6s var(--ease-out) infinite;
+}
+
+@keyframes contact-lock {
+  0%, 70%, 100% { transform: rotate(0) scale(1); }
+  80% { transform: rotate(90deg) scale(0.85); }
+  90% { transform: rotate(90deg) scale(1.08); filter: drop-shadow(0 0 6px var(--cyan)); }
+}
+
+.contact__label {
+  font-size: 0.8rem;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+}
+
+.contact__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.contact__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22e37a;
+  box-shadow: 0 0 0 0 rgba(34, 227, 122, 0.6);
+  animation: hero-ping 2s infinite;
+}
+
+/* The big address */
+.contact__address {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.45rem, 5.2vw, 3.1rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.contact__address span:not(.contact__at) {
+  min-width: 0;
+}
+
+.contact__at {
+  color: var(--cyan);
+  margin: 0 0.06em;
+  text-shadow: var(--glow-cyan);
+}
+
+.contact__address:hover {
+  color: var(--cyan);
+  text-shadow: 0 0 24px rgba(var(--cyan-rgb), 0.45);
+}
+
+.contact__address:hover .contact__at {
+  color: var(--violet);
+  filter: brightness(1.5);
+}
+
+.contact__email-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.contact__copy {
+  min-width: 160px;
+}
+
+.contact__copy-icon {
+  display: inline-grid;
+}
+
+.contact__copy.is-copied {
+  background: linear-gradient(110deg, #18c96a, #00e5cc);
+}
+
+.contact__copy.is-copied .contact__copy-icon {
+  animation: contact-pop 0.45s var(--ease-spring);
+}
+
+@keyframes contact-pop {
+  from { transform: scale(0) rotate(-45deg); }
+}
+
+.contact__socials {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* ---------- Social cards ---------- */
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  overflow: hidden;
+  transition: transform 0.5s var(--ease-out), border-color 0.3s, box-shadow 0.3s;
+}
+
+.social:hover {
+  border-color: color-mix(in srgb, var(--brand) 60%, transparent);
+  box-shadow: var(--shadow), 0 0 32px -12px var(--brand);
+}
+
+.social__icon {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #fff;
+  background: var(--brand);
+  box-shadow: 0 10px 22px -10px var(--brand);
+  transition: transform 0.45s var(--ease-spring);
+}
+
+.social:hover .social__icon {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.social__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.social__text strong {
+  font-size: 1.05rem;
+}
+
+.social__text .mono {
+  font-size: 0.78rem;
+  color: var(--cyan);
+}
+
+.social__text small {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.social__arrow {
+  color: var(--text-dim);
+  transition: transform 0.35s var(--ease-out), color 0.3s;
+}
+
+.social:hover .social__arrow {
+  color: var(--text);
+  transform: translate3d(3px, -3px, 0);
+}
+
+@media (max-width: 640px) {
+  .contact__socials {
+    grid-template-columns: 1fr;
+  }
+  .contact__email {
+    padding: 26px 18px 22px;
+  }
+  .contact__email-actions {
+    flex-direction: column;
+    align-self: stretch;
+  }
+  .contact__email-actions .btn {
+    width: 100%;
+    white-space: nowrap;
+  }
+  .contact__address {
+    font-size: clamp(1rem, 4.6vw, 1.6rem);
+  }
+}

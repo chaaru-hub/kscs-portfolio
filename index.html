@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Karanam Selvakumar Chaaruseelan (KSCS) — Full-Stack Developer, AI Integrations & Software Craftsmanship. CSE @ SRM Institute of Science and Technology, Chennai." />
+    <meta name="theme-color" content="#080909" />
+    <title>KSCS. | Chaaruseelan — Developer Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // Apply saved settings before first paint to avoid a theme flash.
+      try {
+        var r = document.documentElement;
+        var s = JSON.parse(localStorage.getItem('kscs-settings') || 'null');
+        var t = s ? s.theme : localStorage.getItem('kscs-theme');
+        if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
+        if (s && s.accent) r.setAttribute('data-accent', s.accent);
+        if (s && s.motion) r.setAttribute('data-motion', s.motion);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

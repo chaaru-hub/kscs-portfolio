@@ -1,0 +1,186 @@
+.profile-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: #080909;
+  color: #e8f3f1;
+  font-family: var(--font-mono);
+  transition: opacity 0.8s var(--ease-out), visibility 0.8s, transform 0.8s var(--ease-out);
+  overflow: hidden;
+}
+
+.profile-loader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 204, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 204, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, #000 10%, transparent 65%);
+}
+
+.profile-loader--exit {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.profile-loader__scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, transparent, rgba(111, 0, 255, 0.08), transparent);
+  animation: pl-scan 3.2s linear infinite;
+}
+
+@keyframes pl-scan {
+  from { transform: translateY(-120px); }
+  to { transform: translateY(100vh); }
+}
+
+.profile-loader__core {
+  position: relative;
+  width: min(240px, 62vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.profile-loader__rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.profile-loader__rings .ring {
+  transform-origin: 120px 120px;
+  will-change: transform;
+}
+.ring--outer { animation: pl-spin 9s linear infinite; }
+.ring--mid { animation: pl-spin 5s linear infinite reverse; }
+.ring--inner { animation: pl-spin 14s linear infinite; }
+.ring--bead { animation: pl-spin 2.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+.ring--bead .bead { filter: drop-shadow(0 0 6px #00e5cc) drop-shadow(0 0 12px #00e5cc); }
+
+@keyframes pl-spin {
+  to { transform: rotate(360deg); }
+}
+
+.profile-loader__badge {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 229, 204, 0.8), 0 0 28px rgba(0, 229, 204, 0.4);
+  animation: pl-pulse 2s ease-in-out infinite;
+}
+
+.profile-loader__badge .dot {
+  color: #6f00ff;
+  text-shadow: 0 0 12px #6f00ff, 0 0 26px #6f00ff;
+}
+
+@keyframes pl-pulse {
+  50% { text-shadow: 0 0 16px rgba(0, 229, 204, 1), 0 0 40px rgba(0, 229, 204, 0.55); }
+}
+
+.profile-loader__label {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  display: flex;
+}
+
+.profile-loader__label span {
+  opacity: 0;
+  color: #00e5cc;
+  animation: pl-letter 2.6s var(--ease-out) infinite;
+}
+
+@keyframes pl-letter {
+  0% { opacity: 0; transform: translateY(6px); text-shadow: none; }
+  15% { opacity: 1; transform: none; text-shadow: 0 0 8px #00e5cc, 0 0 18px #00e5cc; }
+  70% { opacity: 1; text-shadow: 0 0 4px rgba(0, 229, 204, 0.5); }
+  100% { opacity: 0.25; }
+}
+
+.profile-loader__bar {
+  position: relative;
+  width: min(340px, 78vw);
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.profile-loader__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, #00e5cc, #6f00ff);
+  box-shadow: 0 0 12px #00e5cc;
+  will-change: transform;
+}
+
+.profile-loader__meta {
+  width: min(340px, 78vw);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: #5d6e6b;
+  margin-top: -18px;
+}
+
+.profile-loader__meta .pct {
+  color: #00e5cc;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-loader__skip {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8fa3a0;
+  border: 1px solid rgba(0, 229, 204, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  opacity: 0;
+  animation: pl-skip-in 0.6s 0.8s var(--ease-out) forwards;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.profile-loader__skip:hover {
+  color: #00e5cc;
+  border-color: #00e5cc;
+}
+
+.profile-loader__skip kbd {
+  color: #8fa3a0;
+  background: #141819;
+  border-color: rgba(0, 229, 204, 0.2);
+}
+
+@keyframes pl-skip-in {
+  to { opacity: 1; }
+}
