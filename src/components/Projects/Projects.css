@@ -877,3 +877,20 @@
     height: 50rem;
   }
 }
+
+/* "Visit project" — greyed out until a live link is added in projectsData.js */
+.pcard__visit.is-pending {
+  background: var(--bg-elev-2);
+  color: var(--text-dim);
+  border: 1px dashed var(--border-strong);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.pcard__visit.is-pending::after {
+  display: none;
+}
+
+.pcard__visit.is-pending:hover {
+  transform: none;
+}

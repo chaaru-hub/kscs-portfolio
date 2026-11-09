@@ -17,7 +17,7 @@ npm run lint     # oxlint
 ## Interactions & settings
 
 - **Settings panel** (gear icon or `S`): theme (dark / light / system), home visual (3D globe or orbit), 4 accent palettes (Cyber, Aurora, Sunset, Plasma), full or reduced motion, and toggles for the custom cursor, particle background and UI sounds. Everything is saved in `localStorage`.
-- **Command palette** (`Ctrl/⌘ + K` or `/`): fuzzy search to jump to sections, open project case studies, copy the email, switch theme and open links.
+- **Command palette** (`Ctrl/⌘ + K` or `/`): fuzzy search to jump to sections, visit projects, copy the email, switch theme and open links.
 - **Shortcuts:** `T` toggles the theme, `S` opens settings and `Esc` closes any panel.
 - **Theme switch:** a circular reveal that grows from the click point (View Transitions API, with a normal fallback in other browsers).
 - **Motion layer:** an interactive particle constellation, 3D tilt and a cursor spotlight on cards, magnetic buttons, letter-by-letter name animation, scramble-decoding section labels, a tech marquee and a scroll progress bar.
@@ -29,7 +29,7 @@ npm run lint     # oxlint
 | What | Where |
 | --- | --- |
 | Profile photo | `public/profile.jpg` (square, face-centred). If it is missing, `public/profile-placeholder.svg` is shown. |
-| Projects, repo links | `src/data/projectsData.js` (`repo` currently points at a GitHub search; swap in exact URLs) |
+| Projects, repo + live links | `src/data/projectsData.js`: `repo` (GitHub) and `live` (where "Visit project" goes; empty shows "Link coming soon") |
 | Skill bubbles, metrics, curriculum | `src/data/skillsData.js` (metric numbers are placeholders) |
 | Certificates | Scans are in `public/certificates/`, with details in `src/data/certificationsData.js`. A missing image falls back to a generated card marked "Preview". |
 | Resume | `public/resume/Karanam_Selvakumar_Chaaruseelan_Resume.pdf` (name and path in `src/data/resumeData.js`). Replace the file to update it. |
@@ -53,7 +53,7 @@ src/
     Hero/                     typewriter + interactive 3D tech globe (TechGlobe: canvas sphere, projected logo nodes, drag/hover) or the radial orbit arena (CSS --angle) around an animated KSCS monogram; click it to replay the cascade
     About/ProfileIDCard       developer-pass front (photo, seal, info grid, access matrix) + system-profile back (mag stripe, terminal, signature); holographic reel-down entrance (string reels out, card spins in, scan line) → pendulum sway, 3D hover flip, click bob to replay
     Skills/                   tech-matrix bubbles + HUD tooltip, eased counters
-    Projects/                 flip cards that rotate + widen on hover (neighbours shrink); back shows an animated mock UI per project (ProjectVisual); case-study modal
+    Projects/                 flip cards that rotate + widen on hover (neighbours shrink); back shows an animated mock UI per project (ProjectVisual) with Repository + Visit project links
     Certifications/           credential cards + lightbox (Esc, scroll lock)
     Resume/                   lazy-loaded PDF.js viewer (legacy build): zoom, open in new tab, download
     Contact/                  large email (copy / send) with LinkedIn + GitHub cards underneath

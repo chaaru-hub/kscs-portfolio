@@ -1,6 +1,7 @@
 const GITHUB = 'https://github.com/chaaru-hub';
 
 // `repo` points at a GitHub search for now — swap in the exact repository URL when ready.
+// `live` is where "Visit project" goes; leave it empty to show the button as "Link coming soon".
 export const PROJECTS = [
   {
     id: 'resq',
@@ -24,6 +25,7 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Vite', 'Python', 'FastAPI', 'Leaflet.js'],
     repo: `${GITHUB}?tab=repositories&q=ResQ`,
+    live: '',
   },
   {
     id: 'ecomind',
@@ -47,6 +49,7 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Vite', 'Python', 'FastAPI', 'Chart.js'],
     repo: `${GITHUB}?tab=repositories&q=EcoMind`,
+    live: '',
   },
   {
     id: 'civic-ai',
@@ -70,5 +73,6 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Python', 'FastAPI', 'NLP', 'SQL'],
     repo: `${GITHUB}?tab=repositories&q=Civic`,
+    live: '',
   },
 ];

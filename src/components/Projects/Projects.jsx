@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, CheckCircle2, Code2, FileText, MousePointer2, RotateCw } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, CheckCircle2, Code2, MousePointer2, RotateCw } from 'lucide-react';
 import Reveal from '../common/Reveal';
 import ScrambleText from '../common/ScrambleText';
 import { GithubIcon } from '../common/BrandIcons';
 import { PROJECTS } from '../../data/projectsData';
-import ProjectModal from './ProjectModal';
 import ProjectVisual from './ProjectVisual';
 import { reserveFrames } from '../../utils/motionBudget';
 import './Projects.css';
 
-function ProjectCard({ project, index, onOpen }) {
+function ProjectCard({ project, index }) {
   const [open, setOpen] = useState(false);
   // Bumped on every opening so the mock screen remounts and replays its animation.
   const [openCount, setOpenCount] = useState(0);
@@ -135,14 +134,21 @@ function ProjectCard({ project, index, onOpen }) {
               >
                 <GithubIcon size={15} /> Repository
               </a>
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={(e) => onOpen(project, e.currentTarget)}
-                tabIndex={open ? 0 : -1}
-              >
-                <FileText size={15} /> Case study
-              </button>
+              {project.live ? (
+                <a
+                  className="btn btn-primary btn-sm pcard__visit"
+                  href={project.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  tabIndex={open ? 0 : -1}
+                >
+                  Visit project <ArrowUpRight size={15} />
+                </a>
+              ) : (
+                <span className="btn btn-primary btn-sm pcard__visit is-pending" aria-disabled="true" title="Link coming soon">
+                  Link coming soon
+                </span>
+              )}
             </div>
             </div>
           </div>
@@ -153,32 +159,6 @@ function ProjectCard({ project, index, onOpen }) {
 }
 
 export default function Projects() {
-  const [active, setActive] = useState(null);
-  const [returnFocus, setReturnFocus] = useState(null);
-
-  const open = useCallback((project, trigger) => {
-    setReturnFocus(trigger);
-    setActive(project);
-  }, []);
-
-  // Deep-link from the command palette.
-  useEffect(() => {
-    const onOpen = (e) => {
-      const project = PROJECTS.find((p) => p.id === e.detail);
-      if (!project) return;
-      document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
-      setReturnFocus(document.activeElement);
-      setActive(project);
-    };
-    window.addEventListener('kscs:open-project', onOpen);
-    return () => window.removeEventListener('kscs:open-project', onOpen);
-  }, []);
-
-  const close = useCallback(() => {
-    setActive(null);
-    returnFocus?.focus?.();
-  }, [returnFocus]);
-
   return (
     <section id="projects" className="section projects">
       <div className="container">
@@ -190,13 +170,13 @@ export default function Projects() {
             Built to <span className="text-gradient">solve real problems</span>.
           </h2>
           <p className="section-sub">
-            Point at a card to flip it open, then read the case study for the full architecture breakdown.
+            Point at a card to flip it open, then visit the project to try it live.
           </p>
         </Reveal>
 
         <Reveal className="projects__grid">
           {PROJECTS.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} onOpen={open} />
+            <ProjectCard key={p.id} project={p} index={i} />
           ))}
         </Reveal>
 
@@ -206,8 +186,6 @@ export default function Projects() {
           </a>
         </Reveal>
       </div>
-
-      <ProjectModal project={active} onClose={close} />
     </section>
   );
 }

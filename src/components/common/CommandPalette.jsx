@@ -50,15 +50,15 @@ function PaletteBody({ onClose, onOpenSettings, onToggleTheme, toast }) {
       { group: 'Navigate', label: 'Home', hint: 'Hero', Icon: Home, run: () => goTo('home') },
       { group: 'Navigate', label: 'About me', hint: 'ID card', Icon: User, run: () => goTo('about') },
       { group: 'Navigate', label: 'Skills', hint: 'Tech matrix', Icon: Sparkles, run: () => goTo('skills') },
-      { group: 'Navigate', label: 'Projects', hint: 'Case studies', Icon: FolderGit2, run: () => goTo('projects') },
+      { group: 'Navigate', label: 'Projects', hint: 'Live projects', Icon: FolderGit2, run: () => goTo('projects') },
       { group: 'Navigate', label: 'Credentials', hint: 'Hackathons', Icon: Award, run: () => goTo('certifications') },
       { group: 'Navigate', label: 'Contact', hint: 'Say hello', Icon: Mail, run: () => goTo('contact') },
       ...PROJECTS.map((p) => ({
         group: 'Projects',
-        label: `Open ${p.title}`,
+        label: p.live ? `Visit ${p.title}` : `${p.title} (link coming soon)`,
         hint: p.category,
         Icon: Code2,
-        run: () => window.dispatchEvent(new CustomEvent('kscs:open-project', { detail: p.id })),
+        run: () => (p.live ? openLink(p.live) : goTo('projects')),
       })),
       { group: 'Actions', label: 'View resume', hint: 'PDF · download', Icon: FileText, run: openResume },
       {
