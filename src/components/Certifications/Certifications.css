@@ -1,7 +1,7 @@
 .certs__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
 }
 
 .cert {
@@ -354,9 +354,12 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 860px) {
+/* one centred column below desktop, so three cards never leave one alone in a row */
+@media (max-width: 1080px) {
   .certs__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 680px;
+    margin-inline: auto;
   }
 }
 

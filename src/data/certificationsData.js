@@ -30,4 +30,18 @@ export const CERTIFICATIONS = [
     image: 'certificates/isro-bharatiya-antariksh-hackathon-2026.jpg',
     link: 'https://www.isro.gov.in/',
   },
+  {
+    id: 'synesis-26',
+    title: "SYNESIS '26 Hackathon",
+    issuer: 'SRM IST Ramapuram',
+    type: 'Certificate of Participation',
+    date: '13 Oct 2026',
+    description:
+      'Took part in SYNESIS ’26, a 6-hour hackathon conducted by SRM Institute of Science and Technology, Ramapuram, with the Departments of CSE (IoT) and CSBS.',
+    tags: ['6-Hour Hackathon', 'IoT', 'Rapid Prototyping'],
+    accent: '#c9a24a',
+    accent2: '#1b2f5e',
+    image: 'certificates/synesis-26-hackathon.jpg',
+    link: 'https://www.srmist.edu.in/',
+  },
 ];
