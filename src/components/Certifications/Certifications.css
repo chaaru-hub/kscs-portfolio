@@ -1,73 +1,243 @@
-.certs__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+/* ==========================================================
+   Credentials: an overlapping deck. Each card shows its top band;
+   one card is open at a time and the cards below it slide down.
+   Height is constant: (n - 1) bands + one open card.
+   ========================================================== */
+
+.cstack {
+  --band: 84px;
+  --h: 400px;
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  height: calc((var(--n) - 1) * var(--band) + var(--h));
+  border-radius: 30px;
+  overflow: hidden;
 }
 
-.cert {
-  overflow: hidden;
-  height: 100%;
+.cstack__card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--h);
+  z-index: calc(var(--i) + 1);
   display: flex;
   flex-direction: column;
-  transition: transform 0.5s var(--ease-out), border-color 0.3s, box-shadow 0.3s;
+  border-radius: 30px;
+  color: var(--text);
+  /* each layer a little deeper in the accent, like the reference swatches */
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--a1) 14%, transparent), transparent 55%),
+    color-mix(in srgb, var(--cyan) var(--mix), var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--cyan) 22%, var(--border));
+  box-shadow: 0 -14px 30px -18px rgba(0, 0, 0, 0.7);
+  transform: translate3d(0, calc(var(--i) * var(--band)), 0);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s;
+  will-change: transform;
 }
 
-.cert:hover {
-  border-color: color-mix(in srgb, var(--a1) 45%, transparent);
-  box-shadow: var(--shadow), 0 0 40px -18px var(--a1);
+.cstack__card.is-below {
+  transform: translate3d(0, calc(var(--i) * var(--band) + var(--h) - var(--band)), 0);
 }
 
-.cert__preview {
-  position: relative;
-  display: block;
+.cstack__card.is-open {
+  border-color: color-mix(in srgb, var(--a1) 55%, var(--border));
+}
+
+/* ---------- Band ---------- */
+
+.cstack__band {
+  flex-shrink: 0;
+  height: var(--band);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  text-align: left;
   width: 100%;
-  padding: 20px;
+}
+
+.cstack__num {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  transition: color 0.3s;
+}
+
+.cstack__card.is-open .cstack__num {
+  color: var(--cyan);
+}
+
+.cstack__dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--a1) 70%, transparent);
+}
+
+.cstack__heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cstack__heading strong {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cstack__heading span {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cstack__verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: #22e37a;
+  background: rgba(34, 227, 122, 0.08);
+  border: 1px solid rgba(34, 227, 122, 0.3);
+}
+
+/* ---------- Open body ---------- */
+
+.cstack__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 26px;
+  padding: 4px 28px 26px;
+  opacity: 0.35;
+  transition: opacity 0.45s ease;
+}
+
+.cstack__card.is-open .cstack__body {
+  opacity: 1;
+}
+
+.cstack__visual {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  overflow: hidden;
   background:
     radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--a1) 22%, transparent), transparent 60%),
     radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--a2) 18%, transparent), transparent 60%),
     var(--bg-elev-2);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
+  border: 1px solid var(--border);
 }
 
-.cert__preview > :first-child {
+.cstack__visual > :first-child {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   transition: transform 0.6s var(--ease-out);
 }
 
-.cert__preview:hover > :first-child {
-  transform: scale(1.03) rotate(-0.6deg);
+.cstack__visual:hover > :first-child {
+  transform: scale(1.03);
 }
 
-.cert__zoom {
+.cstack__zoom {
   position: absolute;
-  right: 30px;
-  bottom: 30px;
+  right: 14px;
+  bottom: 14px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #fff;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(6px);
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  transform: translate3d(0, 6px, 0);
   transition: opacity 0.3s, transform 0.3s var(--ease-out);
 }
 
-.cert__preview:hover .cert__zoom,
-.cert__preview:focus-visible .cert__zoom {
+.cstack__visual:hover .cstack__zoom,
+.cstack__visual:focus-visible .cstack__zoom {
   opacity: 1;
   transform: none;
+}
+
+.cstack__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cstack__type {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--cyan);
+}
+
+.cstack__id {
+  margin: -4px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.cstack__desc {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+
+.cstack__tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cstack__actions {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.cstack__hint {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
 }
 
 .cert-img {
   display: block;
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.45));
 }
@@ -354,21 +524,33 @@
   text-transform: uppercase;
 }
 
-/* one centred column below desktop, so three cards never leave one alone in a row */
-@media (max-width: 1080px) {
-  .certs__grid {
+/* Phones / narrow tablets: image above details, taller open card */
+@media (max-width: 760px) {
+  .cstack {
+    --band: 76px;
+    --h: 620px;
+    border-radius: 24px;
+  }
+  .cstack__card {
+    border-radius: 24px;
+  }
+  .cstack__band {
+    padding: 0 18px;
+    gap: 10px;
+  }
+  .cstack__verified {
+    display: none;
+  }
+  .cstack__heading strong {
+    font-size: 0.98rem;
+  }
+  .cstack__body {
     grid-template-columns: minmax(0, 1fr);
-    max-width: 680px;
-    margin-inline: auto;
+    grid-template-rows: 200px minmax(0, 1fr);
+    gap: 16px;
+    padding: 2px 18px 20px;
   }
-}
-
-@media (max-width: 560px) {
-  .lightbox {
-    padding: 14px;
-  }
-  .lightbox__close {
-    top: 6px;
-    right: 6px;
+  .cstack__actions .btn {
+    flex: 1;
   }
 }

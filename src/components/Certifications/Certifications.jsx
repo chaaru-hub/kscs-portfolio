@@ -81,8 +81,11 @@ function Lightbox({ cert, onClose }) {
 }
 
 export default function Certifications() {
-  const [active, setActive] = useState(null);
-  const close = useCallback(() => setActive(null), []);
+  const [preview, setPreview] = useState(null);
+  const closePreview = useCallback(() => setPreview(null), []);
+  const last = CERTIFICATIONS.length - 1;
+  // One card is open at a time; at rest it is the last (front) card, as in a fanned deck.
+  const [open, setOpen] = useState(last);
 
   return (
     <section id="certifications" className="section certs">
@@ -97,56 +100,86 @@ export default function Certifications() {
           <p className="section-sub">Hackathons where ideas had hours, not months, to become working software.</p>
         </Reveal>
 
-        <div className="certs__grid">
-          {CERTIFICATIONS.map((c, i) => (
-            <Reveal key={c.id} delay={i * 140}>
-              <article className="cert glass spotlight" data-tilt="5" style={{ '--a1': c.accent, '--a2': c.accent2 }}>
-                <button
-                  type="button"
-                  className="cert__preview"
-                  onClick={() => setActive(c)}
-                  aria-label={`Open ${c.title} certificate`}
+        <Reveal>
+          <div
+            className="cstack"
+            style={{ '--n': CERTIFICATIONS.length }}
+            // Mouse only: touch browsers fire a synthetic leave right after a tap.
+            onPointerLeave={(e) => e.pointerType === 'mouse' && setOpen(last)}
+          >
+            {CERTIFICATIONS.map((c, i) => {
+              const isOpen = open === i;
+              return (
+                // Hover is a shortcut for the band button below, which handles click, tap and focus.
+                <div
+                  key={c.id}
+                  className={`cstack__card ${isOpen ? 'is-open' : ''} ${i > open ? 'is-below' : ''}`}
+                  style={{ '--i': i, '--a1': c.accent, '--a2': c.accent2, '--mix': `${10 + i * 9}%` }}
+                  onPointerEnter={(e) => e.pointerType === 'mouse' && setOpen(i)}
                 >
-                  <CertVisual cert={c} />
-                  <span className="cert__zoom">
-                    <Maximize2 size={18} /> View
-                  </span>
-                </button>
-                <div className="cert__body">
-                  <div className="cert__meta mono">
-                    <span className="cert__verified">
+                  <button
+                    type="button"
+                    className="cstack__band"
+                    onClick={() => setOpen(i)}
+                    onFocus={() => setOpen(i)}
+                    aria-expanded={isOpen}
+                    aria-controls={`cert-body-${c.id}`}
+                  >
+                    <span className="cstack__num mono">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="cstack__dot" aria-hidden="true" />
+                    <span className="cstack__heading">
+                      <strong>{c.title}</strong>
+                      <span className="mono">
+                        {c.issuer} · {c.date}
+                      </span>
+                    </span>
+                    <span className="cstack__verified mono">
                       <BadgeCheck size={14} /> Verified
                     </span>
-                    <span>{c.date}</span>
-                  </div>
-                  <h3>{c.title}</h3>
-                  <p className="cert__issuer mono">
-                    {c.issuer} · {c.type}
-                  </p>
-                  {c.credentialId && <p className="cert__id mono">Credential ID: {c.credentialId}</p>}
-                  <p className="cert__desc">{c.description}</p>
-                  <ul className="cert__tags">
-                    {c.tags.map((t) => (
-                      <li key={t} className="chip">
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="cert__actions">
-                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setActive(c)}>
-                      <Maximize2 size={14} /> Preview
+                  </button>
+
+                  <div className="cstack__body" id={`cert-body-${c.id}`} inert={!isOpen}>
+                    <button
+                      type="button"
+                      className="cstack__visual"
+                      onClick={() => setPreview(c)}
+                      aria-label={`Open ${c.title} certificate`}
+                    >
+                      <CertVisual cert={c} />
+                      <span className="cstack__zoom">
+                        <Maximize2 size={16} /> View
+                      </span>
                     </button>
-                    <a className="btn btn-ghost btn-sm" href={c.link} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink size={14} /> Issuer
-                    </a>
+
+                    <div className="cstack__info">
+                      <p className="cstack__type mono">{c.type}</p>
+                      {c.credentialId && <p className="cstack__id mono">Credential ID: {c.credentialId}</p>}
+                      <p className="cstack__desc">{c.description}</p>
+                      <ul className="cstack__tags">
+                        {c.tags.map((t) => (
+                          <li key={t} className="chip">
+                            {t}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="cstack__actions">
+                        <button type="button" className="btn btn-primary btn-sm" onClick={() => setPreview(c)}>
+                          <Maximize2 size={14} /> Preview
+                        </button>
+                        <a className="btn btn-ghost btn-sm" href={c.link} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink size={14} /> Issuer
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+          <p className="cstack__hint mono">hover or tap a certificate to slide it out</p>
+        </Reveal>
       </div>
-      <Lightbox cert={active} onClose={close} />
+      <Lightbox cert={preview} onClose={closePreview} />
     </section>
   );
 }
