@@ -25,7 +25,7 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Vite', 'Python', 'FastAPI', 'Leaflet.js'],
     repo: `${GITHUB}?tab=repositories&q=ResQ`,
-    live: '',
+    live: 'https://res-q-seven.vercel.app/',
   },
   {
     id: 'ecomind',
@@ -49,7 +49,7 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Vite', 'Python', 'FastAPI', 'Chart.js'],
     repo: `${GITHUB}?tab=repositories&q=EcoMind`,
-    live: '',
+    live: 'https://ecomind-ai-j4zu.vercel.app/settings',
   },
   {
     id: 'civic-ai',
@@ -73,6 +73,6 @@ export const PROJECTS = [
     ],
     stack: ['React', 'Python', 'FastAPI', 'NLP', 'SQL'],
     repo: `${GITHUB}?tab=repositories&q=Civic`,
-    live: '',
+    live: 'https://civic-ai-omega-rose.vercel.app/',
   },
 ];
