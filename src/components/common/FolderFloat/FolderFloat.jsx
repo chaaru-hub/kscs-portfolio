@@ -377,6 +377,7 @@ export default function FolderFloat({
               className="folder-float__item"
               tabIndex={open ? 0 : -1}
               aria-hidden={!open}
+              aria-label={item.content ? item.label : undefined}
               data-pop={popped === i ? '' : undefined}
               style={{
                 '--i': i,
@@ -392,7 +393,8 @@ export default function FolderFloat({
                 if (!world.current.live || e.detail === 0) pick(item, i);
               }}
             >
-              <span className="folder-float__drift">{item.label}</span>
+              {/* Local addition: `content` (e.g. an image) replaces the text; `label` stays the name. */}
+              <span className="folder-float__drift">{item.content ?? item.label}</span>
             </button>
           );
         })}

@@ -104,7 +104,24 @@ const FOLDER_COLORS = {
   labelColor: '#DAF1DE',
 };
 
-const PILLS = CERTIFICATIONS.map((c) => ({ label: c.title, value: c.id }));
+// Each pill is the certificate photo; the title stays as its accessible name.
+const PILLS = CERTIFICATIONS.map((c) => ({
+  label: `${c.title} certificate`,
+  value: c.id,
+  content: (
+    <img
+      className="credfolder__thumb"
+      src={c.image}
+      width={c.imageSize[0]}
+      height={c.imageSize[1]}
+      alt=""
+      draggable="false"
+    />
+  ),
+}));
+
+// Thumbnail height per breakpoint; `lift` must clear it so photos rise fully above the folder.
+const THUMB_H = { wide: 132, narrow: 82 };
 
 function useMedia(query) {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
@@ -160,8 +177,8 @@ export default function Certifications() {
             width={narrow ? 220 : 260}
             height={narrow ? 156 : 180}
             radius={16}
-            spread={narrow ? 160 : 320}
-            lift={34}
+            spread={narrow ? 168 : 320}
+            lift={(narrow ? THUMB_H.narrow : THUMB_H.wide) + 36}
             tilt={8}
             flapAngle={34}
             restAngle={16}
@@ -171,7 +188,7 @@ export default function Certifications() {
           />
         </div>
         <p className="credfolder__hint mono">
-          <span className="credfolder__hint-mouse">hover the folder · click a certificate to view it · drag them around</span>
+          <span className="credfolder__hint-mouse">hover the folder · click a certificate to view it full size · drag them around</span>
           <span className="credfolder__hint-touch">tap the folder · tap a certificate to view it</span>
         </p>
       </div>

@@ -13,6 +13,7 @@ export const CERTIFICATIONS = [
     accent: '#3d6bff',
     accent2: '#7a5cff',
     image: 'certificates/amd-developer-hackathon-act-ii.jpg',
+    imageSize: [480, 681],
     link: 'https://lablab.ai/',
   },
   {
@@ -28,6 +29,7 @@ export const CERTIFICATIONS = [
     accent: '#ff7a1f',
     accent2: '#3d8bff',
     image: 'certificates/isro-bharatiya-antariksh-hackathon-2026.jpg',
+    imageSize: [800, 595],
     link: 'https://www.isro.gov.in/',
   },
   {
@@ -42,6 +44,7 @@ export const CERTIFICATIONS = [
     accent: '#c9a24a',
     accent2: '#1b2f5e',
     image: 'certificates/synesis-26-hackathon.jpg',
+    imageSize: [1311, 921],
     link: 'https://www.srmist.edu.in/',
   },
 ];

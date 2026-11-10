@@ -54,7 +54,7 @@ src/
     About/ProfileIDCard       developer-pass front (photo, seal, info grid, access matrix) + system-profile back (mag stripe, terminal, signature); holographic reel-down entrance (string reels out, card spins in, scan line) → pendulum sway, 3D hover flip, click bob to replay
     Skills/                   tech-matrix bubbles + HUD tooltip, eased counters
     Projects/                 flip cards that rotate + widen on hover (neighbours shrink); back shows an animated mock UI per project (ProjectVisual) with Repository + Visit project links
-    Certifications/           React Bits FolderFloat (common/FolderFloat, matter-js): certificate pills float out of a folder, open on scroll; pick one for the lightbox
+    Certifications/           React Bits FolderFloat (common/FolderFloat, matter-js): certificate photos float out of a folder (item `content`), open on scroll; pick one for the lightbox
     Resume/                   lazy-loaded PDF.js viewer (legacy build): zoom, open in new tab, download
     Contact/                  large email (copy / send) with LinkedIn + GitHub cards underneath
 ```

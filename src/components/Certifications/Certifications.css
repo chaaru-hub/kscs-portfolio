@@ -5,9 +5,10 @@
    ========================================================== */
 
 .credfolder {
+  --thumb-h: 132px;
   display: flex;
   justify-content: center;
-  padding-top: 190px;
+  padding-top: calc(var(--thumb-h) + 90px);
 }
 
 .credfolder .folder-float {
@@ -16,11 +17,21 @@
 }
 
 .credfolder .folder-float__item {
-  font-weight: 600;
-  height: 38px;
-  border-radius: 19px;
-  padding: 0 18px;
-  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(5, 31, 32, 0.08);
+  height: auto;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(5, 31, 32, 0.1);
+}
+
+.credfolder__thumb {
+  display: block;
+  height: var(--thumb-h);
+  width: auto;
+  /* the global img { max-width: 100% } resolves to 0 inside the shrink-to-fit pill */
+  max-width: none;
+  border-radius: 7px;
+  pointer-events: none;
+  user-select: none;
 }
 
 .credfolder .folder-float__item:focus-visible {
@@ -63,7 +74,11 @@
 
 @media (max-width: 560px) {
   .credfolder {
-    padding-top: 230px;
+    --thumb-h: 82px;
+  }
+  .credfolder .folder-float__item {
+    padding: 4px;
+    border-radius: 9px;
   }
   .credfolder .folder-float {
     font-size: 12.5px;
