@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Award, BadgeCheck, ExternalLink, Maximize2, X } from 'lucide-react';
+import { Award, ExternalLink, Maximize2, X } from 'lucide-react';
 import Reveal from '../common/Reveal';
 import ScrambleText from '../common/ScrambleText';
 import useScrollLock from '../../hooks/useScrollLock';
 import useInView from '../../hooks/useInView';
+import FolderFloat from '../common/FolderFloat/FolderFloat';
 import { CERTIFICATIONS } from '../../data/certificationsData';
 import './Certifications.css';
 
@@ -39,16 +40,28 @@ function CertVisual({ cert }) {
   return <CertificateArt cert={cert} />;
 }
 
+// After a tap opens the lightbox, the browser's delayed compatibility mousedown lands on the
+// new backdrop; ignore backdrop presses this soon after opening so it doesn't close at once.
+const BACKDROP_GRACE_MS = 450;
+
 function Lightbox({ cert, onClose }) {
   const closeRef = useRef(null);
+  const openedAt = useRef(0);
   useScrollLock(!!cert, onClose);
   useEffect(() => {
-    if (cert) closeRef.current?.focus();
+    if (!cert) return;
+    openedAt.current = performance.now();
+    closeRef.current?.focus();
   }, [cert]);
   if (!cert) return null;
 
+  const onBackdrop = (e) => {
+    if (e.target !== e.currentTarget || e.timeStamp - openedAt.current < BACKDROP_GRACE_MS) return;
+    onClose();
+  };
+
   return createPortal(
-    <div className="lightbox" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="lightbox" role="presentation" onMouseDown={onBackdrop}>
       <figure className="lightbox__figure" role="dialog" aria-modal="true" aria-label={cert.title}>
         <button type="button" className="lightbox__close" onClick={onClose} aria-label="Close preview" ref={closeRef}>
           <X size={20} />
@@ -81,56 +94,44 @@ function Lightbox({ cert, onClose }) {
   );
 }
 
-const SWAP_LOCK_MS = 650;
+// Folder colours from the deep-green palette the site's accent sits in.
+const FOLDER_COLORS = {
+  folderColor: '#0B2B26',
+  frontColor: '#235347',
+  paperColor: '#DAF1DE',
+  itemColor: '#DAF1DE',
+  itemTextColor: '#051F20',
+  labelColor: '#DAF1DE',
+};
+
+const PILLS = CERTIFICATIONS.map((c) => ({ label: c.title, value: c.id }));
+
+function useMedia(query) {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setMatches(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+  return matches;
+}
 
 export default function Certifications() {
   const [preview, setPreview] = useState(null);
   const closePreview = useCallback(() => setPreview(null), []);
-  const n = CERTIFICATIONS.length;
-  const mid = (n - 1) / 2;
-  const [active, setActive] = useState(Math.floor(mid));
-  const [pouchRef, opened] = useInView({ threshold: 0.35 });
-  // After a swap the cards move under a still pointer; ignore hovers until they settle.
-  const locked = useRef(false);
-  const lockTimer = useRef(0);
-  const pending = useRef(null); // card hovered while locked; applied when the lock ends
-  // Mirrors `active` for the lock timer; bringToFront is the only writer of both.
-  const activeRef = useRef(active);
-  useEffect(() => () => clearTimeout(lockTimer.current), []);
+  const narrow = useMedia('(max-width: 560px)');
+  const touch = useMedia('(hover: none), (pointer: coarse)');
+  const [folderRef, inView] = useInView({ threshold: 0.5 });
 
-  const [settled, setSettled] = useState(false);
-
-  // The opening animation staggers each card; afterwards swaps should respond at once.
+  // Open the folder once when the section scrolls into view, so the certificates fly out.
   useEffect(() => {
-    if (!opened) return undefined;
-    const id = window.setTimeout(() => setSettled(true), 1700);
-    return () => clearTimeout(id);
-  }, [opened]);
+    if (!inView) return;
+    const trigger = folderRef.current?.querySelector('.folder-float__trigger');
+    if (trigger?.getAttribute('aria-expanded') === 'false') trigger.click();
+  }, [inView, folderRef]);
 
-  const bringToFront = (i) => {
-    if (i === activeRef.current) return;
-    locked.current = true;
-    pending.current = null;
-    clearTimeout(lockTimer.current);
-    lockTimer.current = window.setTimeout(() => {
-      locked.current = false;
-      const next = pending.current;
-      pending.current = null;
-      if (next !== null && next !== activeRef.current) bringToFront(next);
-    }, SWAP_LOCK_MS);
-    activeRef.current = i;
-    setActive(i);
-  };
-
-  const onCardPointerMove = (e, i) => {
-    if (e.pointerType !== 'mouse') return;
-    if (locked.current) {
-      // Remember only real pointer movement, so a still cursor never swaps cards back and forth.
-      pending.current = i;
-      return;
-    }
-    bringToFront(i);
-  };
+  const onSelect = (id) => setPreview(CERTIFICATIONS.find((c) => c.id === id) ?? null);
 
   return (
     <section id="certifications" className="section certs">
@@ -145,90 +146,33 @@ export default function Certifications() {
           <p className="section-sub">Hackathons where ideas had hours, not months, to become working software.</p>
         </Reveal>
 
-        <div ref={pouchRef} className={`pouch ${opened ? 'is-open' : ''} ${settled ? 'is-settled' : ''}`} style={{ '--n': n }}>
-          <div className="pouch__back" aria-hidden="true">
-            <span className="pouch__flap" />
-          </div>
-
-          <div className="pouch__cards">
-            {CERTIFICATIONS.map((c, i) => {
-              const isActive = i === active;
-              const k = i - mid;
-              return (
-                // Hover is a mouse shortcut; the band button handles click, tap and keyboard focus.
-                <div
-                  key={c.id}
-                  className={`pcert ${isActive ? 'is-active' : ''}`}
-                  style={{
-                    '--k': k,
-                    '--i': i,
-                    '--depth': Math.abs(k),
-                    '--a1': c.accent,
-                    '--a2': c.accent2,
-                  }}
-                  onPointerMove={(e) => onCardPointerMove(e, i)}
-                  // Touch: a tap anywhere on a card's visible strip brings it forward
-                  // (a scroll gesture ends in pointercancel, not pointerup).
-                  onPointerUp={(e) => e.pointerType !== 'mouse' && bringToFront(i)}
-                >
-                  <button
-                    type="button"
-                    className="pcert__band"
-                    onClick={() => bringToFront(i)}
-                    onFocus={() => bringToFront(i)}
-                    aria-pressed={isActive}
-                  >
-                    <span className="pcert__dot" aria-hidden="true" />
-                    <span className="pcert__heading">
-                      <strong>{c.title}</strong>
-                      <span className="mono">
-                        {c.issuer} · {c.date}
-                      </span>
-                    </span>
-                    <BadgeCheck size={16} className="pcert__check" aria-label="Verified" />
-                  </button>
-
-                  <button
-                    type="button"
-                    className="pcert__visual"
-                    onClick={() => (isActive ? setPreview(c) : bringToFront(i))}
-                    aria-label={isActive ? `Open ${c.title} certificate` : `Show ${c.title}`}
-                    tabIndex={isActive ? 0 : -1}
-                  >
-                    <CertVisual cert={c} />
-                    <span className="pcert__zoom">
-                      <Maximize2 size={14} /> View
-                    </span>
-                  </button>
-
-                  <div className="pcert__info" inert={!isActive}>
-                    <p className="pcert__type mono">{c.type}</p>
-                    <p className="pcert__desc">{c.description}</p>
-                    <div className="pcert__actions">
-                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setPreview(c)}>
-                        <Maximize2 size={14} /> Preview
-                      </button>
-                      <a className="btn btn-ghost btn-sm" href={c.link} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink size={14} /> Issuer
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="pouch__front" aria-hidden="true">
-            <span className="pouch__stitch" />
-            <span className="pouch__label mono">KSCS · CREDENTIALS</span>
-            <span className="pouch__count mono">
-              {n} VERIFIED
-            </span>
-          </div>
+        <div ref={folderRef} className="credfolder">
+          <FolderFloat
+            items={PILLS}
+            label="Verified credentials"
+            sublabel={`${CERTIFICATIONS.length} hackathon certificates`}
+            trigger={touch ? 'click' : 'hover'}
+            closeOnSelect={false}
+            physics
+            drift={0.5}
+            onSelect={onSelect}
+            {...FOLDER_COLORS}
+            width={narrow ? 220 : 260}
+            height={narrow ? 156 : 180}
+            radius={16}
+            spread={narrow ? 160 : 320}
+            lift={34}
+            tilt={8}
+            flapAngle={34}
+            restAngle={16}
+            openDuration={560}
+            stagger={70}
+            bounce={0.3}
+          />
         </div>
-        <p className="pouch__hint mono">
-          <span className="pouch__hint-mouse">hover a certificate to bring it to the front</span>
-          <span className="pouch__hint-touch">tap a certificate to bring it to the front</span>
+        <p className="credfolder__hint mono">
+          <span className="credfolder__hint-mouse">hover the folder · click a certificate to view it · drag them around</span>
+          <span className="credfolder__hint-touch">tap the folder · tap a certificate to view it</span>
         </p>
       </div>
       <Lightbox cert={preview} onClose={closePreview} />
