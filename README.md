@@ -54,7 +54,7 @@ src/
     About/ProfileIDCard       developer-pass front (photo, seal, info grid, access matrix) + system-profile back (mag stripe, terminal, signature); holographic reel-down entrance (string reels out, card spins in, scan line) → pendulum sway, 3D hover flip, click bob to replay
     Skills/                   tech-matrix bubbles + HUD tooltip, eased counters
     Projects/                 flip cards that rotate + widen on hover (neighbours shrink); back shows an animated mock UI per project (ProjectVisual) with Repository + Visit project links
-    Certifications/           stacked deck: one card open, the others as bands; hover / tap slides a card out; lightbox (Esc, scroll lock)
+    Certifications/           pouch: flap opens on scroll, cards rise out as a fan; hover / tap swaps a card to the front; lightbox (Esc, scroll lock)
     Resume/                   lazy-loaded PDF.js viewer (legacy build): zoom, open in new tab, download
     Contact/                  large email (copy / send) with LinkedIn + GitHub cards underneath
 ```

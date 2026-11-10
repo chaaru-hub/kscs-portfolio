@@ -4,6 +4,7 @@ import { Award, BadgeCheck, ExternalLink, Maximize2, X } from 'lucide-react';
 import Reveal from '../common/Reveal';
 import ScrambleText from '../common/ScrambleText';
 import useScrollLock from '../../hooks/useScrollLock';
+import useInView from '../../hooks/useInView';
 import { CERTIFICATIONS } from '../../data/certificationsData';
 import './Certifications.css';
 
@@ -80,12 +81,56 @@ function Lightbox({ cert, onClose }) {
   );
 }
 
+const SWAP_LOCK_MS = 650;
+
 export default function Certifications() {
   const [preview, setPreview] = useState(null);
   const closePreview = useCallback(() => setPreview(null), []);
-  const last = CERTIFICATIONS.length - 1;
-  // One card is open at a time; at rest it is the last (front) card, as in a fanned deck.
-  const [open, setOpen] = useState(last);
+  const n = CERTIFICATIONS.length;
+  const mid = (n - 1) / 2;
+  const [active, setActive] = useState(Math.floor(mid));
+  const [pouchRef, opened] = useInView({ threshold: 0.35 });
+  // After a swap the cards move under a still pointer; ignore hovers until they settle.
+  const locked = useRef(false);
+  const lockTimer = useRef(0);
+  const pending = useRef(null); // card hovered while locked; applied when the lock ends
+  // Mirrors `active` for the lock timer; bringToFront is the only writer of both.
+  const activeRef = useRef(active);
+  useEffect(() => () => clearTimeout(lockTimer.current), []);
+
+  const [settled, setSettled] = useState(false);
+
+  // The opening animation staggers each card; afterwards swaps should respond at once.
+  useEffect(() => {
+    if (!opened) return undefined;
+    const id = window.setTimeout(() => setSettled(true), 1700);
+    return () => clearTimeout(id);
+  }, [opened]);
+
+  const bringToFront = (i) => {
+    if (i === activeRef.current) return;
+    locked.current = true;
+    pending.current = null;
+    clearTimeout(lockTimer.current);
+    lockTimer.current = window.setTimeout(() => {
+      locked.current = false;
+      const next = pending.current;
+      pending.current = null;
+      if (next !== null && next !== activeRef.current) bringToFront(next);
+    }, SWAP_LOCK_MS);
+    activeRef.current = i;
+    setActive(i);
+  };
+
+  const onCardPointerMove = (e, i) => {
+    if (e.pointerType !== 'mouse') return;
+    if (locked.current) {
+      // Remember only real pointer movement, so a still cursor never swaps cards back and forth.
+      pending.current = i;
+      return;
+    }
+    bringToFront(i);
+  };
 
   return (
     <section id="certifications" className="section certs">
@@ -100,84 +145,91 @@ export default function Certifications() {
           <p className="section-sub">Hackathons where ideas had hours, not months, to become working software.</p>
         </Reveal>
 
-        <Reveal>
-          <div
-            className="cstack"
-            style={{ '--n': CERTIFICATIONS.length }}
-            // Mouse only: touch browsers fire a synthetic leave right after a tap.
-            onPointerLeave={(e) => e.pointerType === 'mouse' && setOpen(last)}
-          >
+        <div ref={pouchRef} className={`pouch ${opened ? 'is-open' : ''} ${settled ? 'is-settled' : ''}`} style={{ '--n': n }}>
+          <div className="pouch__back" aria-hidden="true">
+            <span className="pouch__flap" />
+          </div>
+
+          <div className="pouch__cards">
             {CERTIFICATIONS.map((c, i) => {
-              const isOpen = open === i;
+              const isActive = i === active;
+              const k = i - mid;
               return (
-                // Hover is a shortcut for the band button below, which handles click, tap and focus.
+                // Hover is a mouse shortcut; the band button handles click, tap and keyboard focus.
                 <div
                   key={c.id}
-                  className={`cstack__card ${isOpen ? 'is-open' : ''} ${i > open ? 'is-below' : ''}`}
-                  style={{ '--i': i, '--a1': c.accent, '--a2': c.accent2, '--mix': `${10 + i * 9}%` }}
-                  onPointerEnter={(e) => e.pointerType === 'mouse' && setOpen(i)}
+                  className={`pcert ${isActive ? 'is-active' : ''}`}
+                  style={{
+                    '--k': k,
+                    '--i': i,
+                    '--depth': Math.abs(k),
+                    '--a1': c.accent,
+                    '--a2': c.accent2,
+                  }}
+                  onPointerMove={(e) => onCardPointerMove(e, i)}
+                  // Touch: a tap anywhere on a card's visible strip brings it forward
+                  // (a scroll gesture ends in pointercancel, not pointerup).
+                  onPointerUp={(e) => e.pointerType !== 'mouse' && bringToFront(i)}
                 >
                   <button
                     type="button"
-                    className="cstack__band"
-                    onClick={() => setOpen(i)}
-                    onFocus={() => setOpen(i)}
-                    aria-expanded={isOpen}
-                    aria-controls={`cert-body-${c.id}`}
+                    className="pcert__band"
+                    onClick={() => bringToFront(i)}
+                    onFocus={() => bringToFront(i)}
+                    aria-pressed={isActive}
                   >
-                    <span className="cstack__num mono">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="cstack__dot" aria-hidden="true" />
-                    <span className="cstack__heading">
+                    <span className="pcert__dot" aria-hidden="true" />
+                    <span className="pcert__heading">
                       <strong>{c.title}</strong>
                       <span className="mono">
                         {c.issuer} · {c.date}
                       </span>
                     </span>
-                    <span className="cstack__verified mono">
-                      <BadgeCheck size={14} /> Verified
+                    <BadgeCheck size={16} className="pcert__check" aria-label="Verified" />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="pcert__visual"
+                    onClick={() => (isActive ? setPreview(c) : bringToFront(i))}
+                    aria-label={isActive ? `Open ${c.title} certificate` : `Show ${c.title}`}
+                    tabIndex={isActive ? 0 : -1}
+                  >
+                    <CertVisual cert={c} />
+                    <span className="pcert__zoom">
+                      <Maximize2 size={14} /> View
                     </span>
                   </button>
 
-                  <div className="cstack__body" id={`cert-body-${c.id}`} inert={!isOpen}>
-                    <button
-                      type="button"
-                      className="cstack__visual"
-                      onClick={() => setPreview(c)}
-                      aria-label={`Open ${c.title} certificate`}
-                    >
-                      <CertVisual cert={c} />
-                      <span className="cstack__zoom">
-                        <Maximize2 size={16} /> View
-                      </span>
-                    </button>
-
-                    <div className="cstack__info">
-                      <p className="cstack__type mono">{c.type}</p>
-                      {c.credentialId && <p className="cstack__id mono">Credential ID: {c.credentialId}</p>}
-                      <p className="cstack__desc">{c.description}</p>
-                      <ul className="cstack__tags">
-                        {c.tags.map((t) => (
-                          <li key={t} className="chip">
-                            {t}
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="cstack__actions">
-                        <button type="button" className="btn btn-primary btn-sm" onClick={() => setPreview(c)}>
-                          <Maximize2 size={14} /> Preview
-                        </button>
-                        <a className="btn btn-ghost btn-sm" href={c.link} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink size={14} /> Issuer
-                        </a>
-                      </div>
+                  <div className="pcert__info" inert={!isActive}>
+                    <p className="pcert__type mono">{c.type}</p>
+                    <p className="pcert__desc">{c.description}</p>
+                    <div className="pcert__actions">
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setPreview(c)}>
+                        <Maximize2 size={14} /> Preview
+                      </button>
+                      <a className="btn btn-ghost btn-sm" href={c.link} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink size={14} /> Issuer
+                      </a>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="cstack__hint mono">hover or tap a certificate to slide it out</p>
-        </Reveal>
+
+          <div className="pouch__front" aria-hidden="true">
+            <span className="pouch__stitch" />
+            <span className="pouch__label mono">KSCS · CREDENTIALS</span>
+            <span className="pouch__count mono">
+              {n} VERIFIED
+            </span>
+          </div>
+        </div>
+        <p className="pouch__hint mono">
+          <span className="pouch__hint-mouse">hover a certificate to bring it to the front</span>
+          <span className="pouch__hint-touch">tap a certificate to bring it to the front</span>
+        </p>
       </div>
       <Lightbox cert={preview} onClose={closePreview} />
     </section>
